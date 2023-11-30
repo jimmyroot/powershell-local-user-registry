@@ -1,8 +1,4 @@
 $regexSID = 'S-1-[0-59]-\d{2}-\d{8,10}-\d{8,10}-\d{8,10}-[1-9]\d{4}$'
-#$keyToHideMSStorage = 'Software\Policies\Microsoft\Office\16.0\Common\Internet'
-##$keyToSetDefaultSaveLocationWord = 'Software\Microsoft\Office\16.0\Word\Options'
-#$keyToSetDefaultSaveLocationWord = 'Software\Microsoft\Office\16.0\Excel\Options'
-#$keyToSetDefaultSaveLocationWord = 'Software\Microsoft\Office\16.0\PowerPoint\RecentFolderList'
 
 $properties = [System.Collections.ArrayList]@(
     @{
