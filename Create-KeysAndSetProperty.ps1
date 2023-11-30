@@ -1,4 +1,8 @@
 $regexSID = 'S-1-[0-59]-\d{2}-\d{8,10}-\d{8,10}-\d{8,10}-[1-9]\d{4}$'
+#$keyToHideMSStorage = 'Software\Policies\Microsoft\Office\16.0\Common\Internet'
+##$keyToSetDefaultSaveLocationWord = 'Software\Microsoft\Office\16.0\Word\Options'
+#$keyToSetDefaultSaveLocationWord = 'Software\Microsoft\Office\16.0\Excel\Options'
+#$keyToSetDefaultSaveLocationWord = 'Software\Microsoft\Office\16.0\PowerPoint\RecentFolderList'
 
 $properties = [System.Collections.ArrayList]@(
     @{
@@ -63,6 +67,7 @@ function Create-KeyAndSetProperty {
         New-ItemProperty -Path $targetKey.PSPath -Name $Name -Type $Type -Value $Value -ErrorAction Stop
     }
     catch {
+        Write-Host "Property $Name already exists, updating properties" -ForegroundColor DarkGreen
         Set-ItemProperty -Path $targetKey.PSPath -Name $Name -Type $Type -Value $Value
     }
 }
@@ -74,7 +79,6 @@ function Set-RegKeys {
         [System.Object]$Profiles
     )
     ForEach ($Profile in $Profiles) {
-
         ForEach ($p in $properties) {
             $fullPathToKey = Get-PathToKey -UserProfileInHKU $Profile -PathToKey $p.key
             Create-KeyAndSetProperty -Key $fullPathToKey -Name $p.name -Type $p.type -Value $p.value
@@ -82,8 +86,21 @@ function Set-RegKeys {
     }
 }
 
-New-PSDrive HKU Registry HKEY_USERS
+try {
+    New-PSDrive HKU Registry HKEY_USERS -ErrorAction Stop
+}
+catch {
+    Write-Host 'HKU already connected, continuing...' -ForegroundColor Green
+}
 
 $loggedInUserProfiles = Get-ChildItem HKU: -ErrorACtion SilentlyContinue | Where-Object {$_.Name -match $regexSID}
 
 Set-RegKeys -Profiles $loggedInUserProfiles
+
+try {
+    Remove-PSDrive HKU -ErrorAction Stop
+} catch {
+    Write-Host 'HKU is already disconneted, nothing to do...' -ForegroundColor Orange
+}
+
+Write-Host 'Done!' -ForegroundColor Green
