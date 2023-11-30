@@ -71,7 +71,7 @@ function Set-RegKeys {
     [CmdletBinding()]
     param(
         [Parameter()]
-        [Microsoft.Win32.RegistryKey]$Profiles
+        [System.Object]$Profiles
     )
     ForEach ($Profile in $Profiles) {
 
