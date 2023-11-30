@@ -56,12 +56,16 @@ function Create-KeyAndSetProperty {
         [System.string]$Value
     )
 
+    write-host $Key
+   
     $targetKey = try {
         Get-Item $Key -ErrorAction Stop
     }
     catch {
-        New-Item $Key
+        New-Item $Key -Force
     }
+
+    Write-Host $Key
 
     try {
         New-ItemProperty -Path $targetKey.PSPath -Name $Name -Type $Type -Value $Value -ErrorAction Stop
@@ -80,7 +84,7 @@ function Set-RegKeys {
     )
     ForEach ($Profile in $Profiles) {
         ForEach ($p in $properties) {
-            $fullPathToKey = Get-PathToKey -UserProfileInHKU $Profile -PathToKey $p.key
+            $fullPathToKey = Get-PathToKey -UserProfileInHKU $Profile[0] -PathToKey $p.key
             Create-KeyAndSetProperty -Key $fullPathToKey -Name $p.name -Type $p.type -Value $p.value
         }
     }
